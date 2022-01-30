@@ -3,8 +3,7 @@
 
 # Installation
 ```bash
-cp dmginstall.py /usr/bin 
-cp dmginstall /usr/bin 
+cp dmginstall.py /usr/bin/dmginstall 
 ```
 Done
 
