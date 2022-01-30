@@ -28,7 +28,7 @@ def install(pathToFile):
     pathToApp = ""
 
     # Searching for volume name in /Volumes using output from above
-    for i in range(0, len(searchForBlock)-1):
+    for i in range(0, len(searchForBlock)):
         if "/Volumes/" in searchForBlock[i]:
             searchForBlock[i] = searchForBlock[i].translate({ord('\t'): None})
             pathToApp = pathToApp + searchForBlock[i] + " "
