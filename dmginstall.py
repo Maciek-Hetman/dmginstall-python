@@ -55,11 +55,8 @@ def install(pathToFile):
     isTherePkgFile = getCommandOutput('find "%s" -maxdepth 2 -iname "*.pkg"'%pathToApp) != ''
     isThereAppFile = getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%pathToApp) != ''
 
-    print(isThereAppFile)
-    print(isTherePkgFile)
-
     if isTherePkgFile == True:
-        os.system('sudo installer -pkg $(find "%s" -maxdepth 2 -iname "*.pkg" -target /'%pathToApp)
+        os.system('sudo installer -pkg "$(find "%s" -maxdepth 2 -iname "*.pkg")" -target /'%pathToApp)
     elif isThereAppFile == True:    
         os.system('cp -r "$(find "%s" -maxdepth 2 -iname "*.app")" /Applications/'%pathToApp)
     else:
