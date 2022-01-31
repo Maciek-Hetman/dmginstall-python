@@ -49,8 +49,10 @@ def install(pathToFile):
         install("/tmp/working.dmg")
         os.system('rm -f /tmp/working.dmg')
 
+    print(pathToApp)
+
     # Last, self explainatory part
-    os.system('cp -r "$(find "%s" \( -iname "*.app" ! -iname "Autoupdate*" \))" /Applications/'%pathToApp)
+    os.system('cp -r "$(find "%s" -maxdepth 2 -iname "*.app")" /Applications/'%pathToApp)
     os.system("hdiutil detach %s"%searchForBlock[0])
 
 install(File_location)
