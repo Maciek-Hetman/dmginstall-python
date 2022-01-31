@@ -12,11 +12,26 @@ File_location = ""
 for i in range(1, len(sys.argv)):
     File_location = File_location + sys.argv[i] + " "
 
-if ".dmg" not in File_location:
-    sys.exit("File is not .dmg")
-
 # Space on end of file locations caused errors
 File_location = File_location[:-1]
+
+if ".zip" in File_location:
+    os.system('unzip "%s"'%File_location)
+    
+    if getCommandOutput('find . -maxdepth 1 -iname "*.app"') != '':
+        os.system('cp -r "%s" /Applications/'%getCommandOutput('find . -maxdepth 1 -iname "*.app"'))
+        sys.exit("Done.")
+        
+    elif getCommandOutput('find . -maxdepth 1 -iname "*.pkg"') != '':
+        os.system('sudo installer -pkg "%s" -target /'%getCommandOutput('find . -maxdepth 1 -iname "*.pkg"'))
+        sys.exit("Done.")
+        
+    elif getCommandOutput('find . -maxdepth 1 -iname "*.dmg"') != '':
+        File_location = getCommandOutput('find . -maxdepth 1 -iname "*.dmg"')
+        File_location = File_location[:-1]
+
+elif ".dmg" not in File_location:
+    sys.exit("File is not .dmg")
 
 # Main function
 def install(pathToFile):
