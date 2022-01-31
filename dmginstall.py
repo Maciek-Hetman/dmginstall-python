@@ -50,7 +50,21 @@ def install(pathToFile):
         os.system('rm -f /tmp/working.dmg')
 
     # Last, self explainatory part
-    os.system('cp -r "$(find "%s" -maxdepth 2 -iname "*.app")" /Applications/'%pathToApp)
+
+    # Search for .pkg and .dmg files
+    isTherePkgFile = getCommandOutput('find "%s" -maxdepth 2 -iname "*.pkg"'%pathToApp) != ''
+    isThereAppFile = getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%pathToApp) != ''
+
+    print(isThereAppFile)
+    print(isTherePkgFile)
+
+    if isTherePkgFile == True:
+        os.system('sudo installer -pkg $(find "%s" -maxdepth 2 -iname "*.pkg" -target /'%pathToApp)
+    elif isThereAppFile == True:    
+        os.system('cp -r "$(find "%s" -maxdepth 2 -iname "*.app")" /Applications/'%pathToApp)
+    else:
+        sys.exit("File not found.")
+    
     os.system("hdiutil detach %s"%searchForBlock[0])
 
 install(File_location)
