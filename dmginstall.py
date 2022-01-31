@@ -5,34 +5,6 @@ import os, subprocess, sys
 def getCommandOutput(command):
     return subprocess.check_output(command, shell=True, universal_newlines=True)
 
-# Original .dmg file location
-File_location = ""
-
-# Since there can be spaces in file names, this part connects args
-for i in range(1, len(sys.argv)):
-    File_location = File_location + sys.argv[i] + " "
-
-# Space on end of file locations caused errors
-File_location = File_location[:-1]
-
-if ".zip" in File_location:
-    os.system('unzip "%s"'%File_location)
-    
-    if getCommandOutput('find . -maxdepth 1 -iname "*.app"') != '':
-        os.system('cp -r "%s" /Applications/'%getCommandOutput('find . -maxdepth 1 -iname "*.app"'))
-        sys.exit("Done.")
-        
-    elif getCommandOutput('find . -maxdepth 1 -iname "*.pkg"') != '':
-        os.system('sudo installer -pkg "%s" -target /'%getCommandOutput('find . -maxdepth 1 -iname "*.pkg"'))
-        sys.exit("Done.")
-        
-    elif getCommandOutput('find . -maxdepth 1 -iname "*.dmg"') != '':
-        File_location = getCommandOutput('find . -maxdepth 1 -iname "*.dmg"')
-        File_location = File_location[:-1]
-
-elif ".dmg" not in File_location:
-    sys.exit("File is not .dmg")
-
 # Main function
 def install(pathToFile):
     # Split output from commnad that mounts dmg file
@@ -79,4 +51,37 @@ def install(pathToFile):
     
     os.system("hdiutil detach %s"%searchForBlock[0])
 
-install(File_location)
+# Original .dmg file location
+File_location = ""
+
+# Since there can be spaces in file names, this part connects args
+for i in range(1, len(sys.argv)):
+    File_location = File_location + sys.argv[i] + " "
+
+File_location = File_location[:-1]
+
+if ".zip" in File_location:
+    os.system('unzip "%s"'%File_location)
+    
+    if getCommandOutput('find . -maxdepth 1 -iname "*.app"') != '':
+        AppLoc = getCommandOutput('find . -maxdepth 1 -iname "*.app"')
+        print(AppLoc)
+        os.system('cp -r "%s" /Applications/'%AppLoc[:-1])
+        sys.exit("Done.")
+        
+    elif getCommandOutput('find . -maxdepth 1 -iname "*.pkg"') != '':
+        PkgLoc = getCommandOutput('find . -maxdepth 1 -iname "*.pkg"')
+        print(PkgLoc)
+        os.system('sudo installer -pkg "%s" -target /'%PkgLoc[:-1])
+        sys.exit("Done.")
+        
+    elif getCommandOutput('find . -maxdepth 1 -iname "*.dmg"') != '':
+        File_location = getCommandOutput('find . -maxdepth 1 -iname "*.dmg"')
+        File_location = File_location[:-1]
+
+elif ".dmg" not in File_location:
+    sys.exit("File is not .dmg")
+
+else:
+    install(File_location)
+
