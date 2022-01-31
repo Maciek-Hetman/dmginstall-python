@@ -65,13 +65,11 @@ if ".zip" in File_location:
     
     if getCommandOutput('find . -maxdepth 1 -iname "*.app"') != '':
         AppLoc = getCommandOutput('find . -maxdepth 1 -iname "*.app"')
-        print(AppLoc)
         os.system('cp -r "%s" /Applications/'%AppLoc[:-1])
         sys.exit("Done.")
         
     elif getCommandOutput('find . -maxdepth 1 -iname "*.pkg"') != '':
         PkgLoc = getCommandOutput('find . -maxdepth 1 -iname "*.pkg"')
-        print(PkgLoc)
         os.system('sudo installer -pkg "%s" -target /'%PkgLoc[:-1])
         sys.exit("Done.")
         
