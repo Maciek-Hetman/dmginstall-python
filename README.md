@@ -3,7 +3,8 @@
 
 # Installation
 ```bash
-cp dmginstall.py /usr/bin/dmginstall 
+cp dmginstall.py /usr/local/bin/dmginstall
+cp vcp /usr/local/bin/vcp
 ```
 Done
 
@@ -13,3 +14,7 @@ Type in terminal of your choice
 dmginstall /path/to/dmg/file.dmg 
 ```
 You can also drag file to terminal window instead of manually typing whole path
+
+## vcp
+vcp is alternative to cp, with progress bar. It's optional if you don't necessarily
+need it. It's compiled from [a this github repo](https://github.com/Leask/VCP). See [a copyright](vcp/COPYRIGHT).

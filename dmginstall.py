@@ -1,11 +1,16 @@
 #!/usr/local/bin/python3
 import os, subprocess, sys
 
-# Return out from given shell commnad
 def getCommandOutput(command):
     return subprocess.check_output(command, shell=True, universal_newlines=True)
 
-# Main function
+def copyApp(path):
+    # Check if user has vcp installed
+    if getCommandOutput('which vcp') != '':
+        os.system('vcp -R "%s" /Applications'%path)
+    else:
+        os.system('cp -r "%s" /Applications'%path)
+
 def install(pathToFile):
     # Split output from commnad that mounts dmg file
     searchForBlock = getCommandOutput("hdiutil attach '%s' | grep /Volumes"%pathToFile).split(" ")
@@ -45,11 +50,12 @@ def install(pathToFile):
     if isTherePkgFile == True:
         os.system('sudo installer -pkg "$(find "%s" -maxdepth 2 -iname "*.pkg")" -target /'%pathToApp)
     elif isThereAppFile == True:    
-        os.system('cp -r "$(find "%s" -maxdepth 2 -iname "*.app")" /Applications/'%pathToApp)
+        copyApp(getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%pathToApp)[:-1])
     else:
         sys.exit("File not found.")
     
     os.system("hdiutil detach %s"%searchForBlock[0])
+        
 
 # Original .dmg file location
 File_location = ""
@@ -61,24 +67,31 @@ for i in range(1, len(sys.argv)):
 File_location = File_location[:-1]
 
 if ".zip" in File_location:
-    os.system('unzip "%s"'%File_location)
+    tmpDir = "/tmp/working"
+    os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir,File_location,tmpDir))
     
-    if getCommandOutput('find . -maxdepth 1 -iname "*.app"') != '':
-        AppLoc = getCommandOutput('find . -maxdepth 1 -iname "*.app"')
-        os.system('cp -r "%s" /Applications/'%AppLoc[:-1])
+    if getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir) != '':
+        AppLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir)
+        copyApp(AppLoc[:-1])
+        os.system('rm -rf "%s"'%tmpDir)
         sys.exit("Done.")
         
-    elif getCommandOutput('find . -maxdepth 1 -iname "*.pkg"') != '':
-        PkgLoc = getCommandOutput('find . -maxdepth 1 -iname "*.pkg"')
+    elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%tmpDir) != '':
+        PkgLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%tmpDir)
         os.system('sudo installer -pkg "%s" -target /'%PkgLoc[:-1])
+        os.system('rm -rf "%s"'%tmpDir)
         sys.exit("Done.")
         
-    elif getCommandOutput('find . -maxdepth 1 -iname "*.dmg"') != '':
-        File_location = getCommandOutput('find . -maxdepth 1 -iname "*.dmg"')
-        File_location = File_location[:-1]
-
+    elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir) != '':
+        File_location = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir)
+        install(File_location[:-1])
+        os.system('rm -rf "%s"'%tmpDir)
+        
+    else:
+        sys.exit("No usable files in archive")
+    
 elif ".dmg" not in File_location:
-    sys.exit("File is not .dmg")
+    sys.exit("File is not .dmg nor .zip")
 
 else:
     install(File_location)
