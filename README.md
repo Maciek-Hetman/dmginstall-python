@@ -1,5 +1,5 @@
 # dmginstall-python
- Dmg installer script, written in python
+ Dmg installer script, written in python. Pkg and zips also work.
 
 # Installation
 ```bash
