@@ -9,6 +9,8 @@ vcp (optional, read below)
 
 ## Installation
 ```bash
+git clone https://github.com/Maciek-Hetman/dmginstall-python.git
+cd dmginstall-python.git
 cp dmginstall.py /usr/local/bin/dmginstall
 cp vcp /usr/local/bin/vcp
 ```
