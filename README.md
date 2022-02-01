@@ -1,16 +1,22 @@
 # dmginstall-python
  Dmg installer script, written in python. Pkg and zips also work.
 
-# Installation
+## Requirements
+Homebrew  
+python3 from Homebrew  
+Xcode Command Line Tools (install by typing in terminal ```xcode-select --install```)  
+vcp (optional, read below)
+
+## Installation
 ```bash
 cp dmginstall.py /usr/local/bin/dmginstall
 cp vcp /usr/local/bin/vcp
 ```
-Done
+Done.
 
-# Usage
+## Usage
 Type in terminal of your choice 
-``` bash
+```bash
 dmginstall /path/to/dmg/file.dmg 
 ```
 You can also drag file to terminal window instead of manually typing whole path
