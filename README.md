@@ -26,6 +26,9 @@ vcp is alternative to cp, with progress bar. It's optional if you don't necessar
 need it. It's compiled from [this github repo](https://github.com/Leask/VCP). See [copyright](vcp/COPYRIGHT).
 
 ## How does it work
+Script detect given file format, in case of dmg it automatically mounts, copy and umount dmg file.
+When given zip file, it unzips it, detects file type installs and remove unzipped files. It can also
+install .pkg files using ```sudo installer -pkg [filename] -target /```
 ![dmg](Screenrecords/dmg_install.gif)
 ![dmg in zip](Screenrecords/dmg_in_zip.gif)
 ![pkg in zip](Screenrecords/pkg_in_zip.gif)
