@@ -5,9 +5,10 @@ def getCommandOutput(command):
     return subprocess.check_output(command, shell=True, universal_newlines=True)
 
 def copyApp(cmd, path):
-    os.system('%s -r "%s" /Applications'%(cmd, path))
+    # bruh vcp doesn't accept -r
+    os.system('%s -R "%s" /Applications'%(cmd, path))
 
-def installDmg(pathToFile):
+def installDmg(cpcmd, pathToFile):
     # Split output from commnad that mounts dmg file
     searchForBlock = getCommandOutput("hdiutil attach '%s' | grep /Volumes"%pathToFile).split(" ")
     # Remove \n from last element, since it caused problems
@@ -32,7 +33,7 @@ def installDmg(pathToFile):
         pathToSecondDmg = pathToSecondDmg[:-1]
         os.system('cp "%s" /tmp/working.dmg'%pathToSecondDmg)
         # When there'are more than 1 dmg files, cp will throw errors, but it works (I'm too tired rn to fix this)
-        installDmg("/tmp/working.dmg")
+        installDmg(cpcmd, "/tmp/working.dmg")
         os.system('rm -f /tmp/working.dmg')
 
     # Search for .pkg and .dmg files
@@ -42,7 +43,7 @@ def installDmg(pathToFile):
     if isTherePkgFile == True:
         os.system('sudo installer -pkg "$(find "%s" -maxdepth 2 -iname "*.pkg")" -target /'%pathToApp)
     elif isThereAppFile == True:    
-        copyApp(getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%pathToApp)[:-1])
+        copyApp(cpcmd, getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%pathToApp)[:-1])
     else:
         sys.exit("File not found.")
     
@@ -71,7 +72,7 @@ if __name__ == '__main__':
         # Check type of file in archive and install it
         if getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir) != '':
             AppLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir)
-            copyApp(AppLoc[:-1])
+            copyApp(cmCmd, AppLoc[:-1])
             os.system('rm -rf "%s"'%tmpDir)
             sys.exit("Done.")
         
@@ -83,7 +84,7 @@ if __name__ == '__main__':
         
         elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir) != '':
             File_location = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir)
-            installDmg(File_location[:-1])
+            installDmg(cpCmd, File_location[:-1])
             os.system('rm -rf "%s"'%tmpDir)
         
         else:
@@ -94,4 +95,4 @@ if __name__ == '__main__':
         sys.exit("File is not .dmg nor .zip")
 
     else:
-        installDmg(File_location)
+        installDmg(cpCmd, File_location)

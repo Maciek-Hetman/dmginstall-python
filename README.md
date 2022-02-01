@@ -24,3 +24,13 @@ You can also drag file to terminal window instead of manually typing whole path
 ## vcp
 vcp is alternative to cp, with progress bar. It's optional if you don't necessarily
 need it. It's compiled from [this github repo](https://github.com/Leask/VCP). See [copyright](vcp/COPYRIGHT).
+
+## How does it work
+![dmg](Screenrecords/dmg_install.gif)
+![dmg in zip](Screenrecords/dmg_in_zip.gif)
+![pkg in zip](Screenrecords/pkg_in_zip.gif)
+
+### to do
+- tbz archive support  
+- tar.gz archive support
+- idk
