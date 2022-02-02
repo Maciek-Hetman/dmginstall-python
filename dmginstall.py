@@ -16,24 +16,21 @@ def printHelp():
     --recent - same as "-r"
     --help - same as "-h"\n """
     
-    sys.exit(message)
+    sys.exit(message)   # This ends program with error, but I don't really care
 
 def getCommandOutput(command):
     return subprocess.check_output(command, shell=True, universal_newlines=True)
 
 def copyApp(cmd, path):
-    # bruh vcp doesn't accept -r
     os.system('%s -R "%s" /Applications'%(cmd, path))
 
-def installDmg(cpcmd, pathToFile):
-    # Split output from commnad that mounts dmg file
-    searchForBlock = getCommandOutput("hdiutil attach '%s' | grep /Volumes"%pathToFile).split(" ")
-    # Remove \n from last element, since it caused problems
-    searchForBlock[len(searchForBlock)-1] = searchForBlock[len(searchForBlock)-1].translate({ord('\n'): None})
-
+def installDmg(pathToFile, cpCmd):
     pathToApp = ""
 
-    # Searching for volume name in /Volumes using output from above
+    # Best way I found so far to get volume name and block device
+    searchForBlock = getCommandOutput('hdiutil attach "%s" | grep /Volumes'%pathToFile).split(" ") 
+    searchForBlock[len(searchForBlock)-1] = searchForBlock[len(searchForBlock)-1].translate({ord('\n'): None})
+
     for i in range(0, len(searchForBlock)):
         if "/Volumes/" in searchForBlock[i]:
             searchForBlock[i] = searchForBlock[i].translate({ord('\t'): None})
@@ -43,54 +40,41 @@ def installDmg(cpcmd, pathToFile):
 
     pathToApp = pathToApp[:-1]
 
-    isThereAnotherDmg = getCommandOutput('find "%s" -iname "*.dmg"'%pathToApp) != ''
-
-    if isThereAnotherDmg == True:
+    if getCommandOutput('find "%s" -iname "*.dmg"'%pathToApp) != '':
         pathToSecondDmg = getCommandOutput('find "%s" -iname "*.dmg"'%pathToApp)
         pathToSecondDmg = pathToSecondDmg[:-1]
         os.system('cp "%s" /tmp/working.dmg'%pathToSecondDmg)
-        # When there'are more than 1 dmg files, cp will throw errors, but it works (I'm too tired rn to fix this)
-        installDmg(cpcmd, "/tmp/working.dmg")
+        installDmg(cpcmd, "/tmp/working.dmg")   # cp throwed some errors but it worked anyways. Didn't tested with vcp yet.
         os.system('rm -f /tmp/working.dmg')
-
-    # Search for .pkg and .dmg files
-    isTherePkgFile = getCommandOutput('find "%s" -maxdepth 2 -iname "*.pkg"'%pathToApp) != ''
-    isThereAppFile = getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%pathToApp) != ''
-
-    if isTherePkgFile == True:
-        os.system('sudo installer -pkg "$(find "%s" -maxdepth 2 -iname "*.pkg")" -target /'%pathToApp)
-    elif isThereAppFile == True:    
-        copyApp(cpcmd, getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%pathToApp)[:-1])
-    else:
-        sys.exit("File not found.")
     
+    installFromArchive(pathToApp, cpCmd)
     os.system("hdiutil detach %s"%searchForBlock[0])
      
-def installFromArchive(workingDir):
+def installFromArchive(workingDir, cpCmd):
     if getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%workingDir) != '':
-        AppLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%workingDir)
-        copyApp(cmCmd, AppLoc[:-1])
-        os.system('rm -rf "%s"'%workingDir)
+        copyApp(cpCmd, getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%workingDir)[:-1])
     
     elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%workingDir) != '':
-        PkgLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%workingDir)
-        os.system('sudo installer -pkg "%s" -target /'%PkgLoc[:-1])
-        os.system('rm -rf "%s"'%workingDir)
+        os.system('sudo installer -pkg "%s" -target /'%(getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%workingDir)[:-1]))
     
     elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%workingDir) != '':
-        fileLocation = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%workingDir)
-        installDmg(cpCmd, fileLocation[:-1])
-        os.system('rm -rf "%s"'%workingDir)
+        installDmg(getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%workingDir)[:-1], cpCmd)
+        if getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%workingDir) != '':
+            copyApp(cpCmd, getCommandOutput('find "%s" -maxdepth 2 -iname "*.app"'%workingDir)[:-1])
+        elif getCommandOutput('find "%s" -maxdepth 2 -iname "*.pkg"'%workingDir) != '':
+            os.system('sudo installer -pkg "$(find "%s" -maxdepth 2 -iname "*.pkg")" -target /'%workingDir)
     
     else:
-        os.system('rm -rf "%s"'%workingDir)
-        sys.exit("No usable files in archive")   
+        sys.exit("No usable files found.")   
 
-# Original .dmg file location
+
+##########################################################
+# Main code, nicely separated from rest of the functions # 
+##########################################################
 if __name__ == '__main__':
     fileLocation = ""
     dirLocation = ""
-    tmpDir = "/tmp/working"
+    tmpDir = "/tmp/dmginstall"
     
     if len(sys.argv) > 1:
         if sys.argv[1] == '-h' or sys.argv == '--help':
@@ -99,8 +83,8 @@ if __name__ == '__main__':
         elif sys.argv[1] == '-r' or sys.argv[1] == '--recent':
             for i in range(2, len(sys.argv)):
                 dirLocation = dirLocation + sys.argv[i] + " "
-            dirLocation = dirLocation[:-1]
-            fileLocation = dirLocation + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation)[:-1]
+
+            fileLocation = dirLocation[:-1] + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation[:-1])[:-1]
     
         else:
             for i in range(1, len(sys.argv)):
@@ -111,26 +95,29 @@ if __name__ == '__main__':
     else:
         sys.exit("No file given")
     
-    # Check whether user has vcp installed
     if getCommandOutput('which vcp') != '':
         cpCmd = "vcp"
     else:
         cpCmd = "cp"
 
+
     if ".zip" in fileLocation:
         os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
-        installFromArchive(tmpDir)
+        installFromArchive(tmpDir, cpCmd)
+        os.system('rm -rf "%s"'%tmpDir)
     
     elif ".tgz" in fileLocation or "tar.gz" in fileLocation:
         os.system('mkdir "%s" && tar -xf "%s" -C "%s"'%(tmpDir, fileLocation, tmpDir))
-        installFromArchive(tmpDir)
+        installFromArchive(tmpDir, cpCmd)
+        os.system('rm -rf "%s"'%tmpDir)
     
     elif ".tbz" in fileLocation or "tar.bz2" in fileLocation:
         os.system('mkdir "%s" && tar -xjf "%s" -C "%s"'%(tmpDir, fileLocation, tmpDir))
-        installFromArchive(tmpDir)
+        installFromArchive(tmpDir, cpCmd)
+        os.system('rm -rf "%s"'%tmpDir)
     
     elif ".dmg" not in fileLocation:
         sys.exit("File type is not supported")
 
     else:
-        installDmg(cpCmd, fileLocation)
+        installDmg(fileLocation, cpCmd)
