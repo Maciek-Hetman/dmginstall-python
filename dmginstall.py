@@ -65,12 +65,32 @@ def installDmg(cpcmd, pathToFile):
         sys.exit("File not found.")
     
     os.system("hdiutil detach %s"%searchForBlock[0])
-        
+     
+def installFromArchive(workingDir):
+    if getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%workingDir) != '':
+        AppLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%workingDir)
+        copyApp(cmCmd, AppLoc[:-1])
+        os.system('rm -rf "%s"'%workingDir)
+    
+    elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%workingDir) != '':
+        PkgLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%workingDir)
+        os.system('sudo installer -pkg "%s" -target /'%PkgLoc[:-1])
+        os.system('rm -rf "%s"'%workingDir)
+    
+    elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%workingDir) != '':
+        fileLocation = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%workingDir)
+        installDmg(cpCmd, fileLocation[:-1])
+        os.system('rm -rf "%s"'%workingDir)
+    
+    else:
+        os.system('rm -rf "%s"'%workingDir)
+        sys.exit("No usable files in archive")   
 
 # Original .dmg file location
 if __name__ == '__main__':
     fileLocation = ""
     dirLocation = ""
+    tmpDir = "/tmp/working"
     
     if sys.argv[1] == '-h' or sys.argv == '--help':
         printHelp()
@@ -93,33 +113,20 @@ if __name__ == '__main__':
     else:
         cpCmd = "cp"
 
-
     if ".zip" in fileLocation:
-        tmpDir = "/tmp/working"
         os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
+        installFromArchive(tmpDir)
     
-        # Check type of file in archive and install it
-        if getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir) != '':
-            AppLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir)
-            copyApp(cmCmd, AppLoc[:-1])
-            os.system('rm -rf "%s"'%tmpDir)
-        
-        elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%tmpDir) != '':
-            PkgLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%tmpDir)
-            os.system('sudo installer -pkg "%s" -target /'%PkgLoc[:-1])
-            os.system('rm -rf "%s"'%tmpDir)
-        
-        elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir) != '':
-            fileLocation = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir)
-            installDmg(cpCmd, fileLocation[:-1])
-            os.system('rm -rf "%s"'%tmpDir)
-        
-        else:
-            os.system('rm -rf "%s"'%tmpDir)
-            sys.exit("No usable files in archive")
+    elif ".tgz" in fileLocation or "tar.gz" in fileLocation:
+        os.system('mkdir "%s" && tar -xf "%s" -C "%s"'%(tmpDir, fileLocation, tmpDir))
+        installFromArchive(tmpDir)
+    
+    elif ".tbz" in fileLocation or "tar.bz2" in fileLocation:
+        os.system('mkdir "%s" && tar -xjf "%s" -C "%s"'%(tmpDir, fileLocation, tmpDir))
+        installFromArchive(tmpDir)
     
     elif ".dmg" not in fileLocation:
-        sys.exit("File is not .dmg nor .zip")
+        sys.exit("File type is not supported")
 
     else:
         installDmg(cpCmd, fileLocation)
