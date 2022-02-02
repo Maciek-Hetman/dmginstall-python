@@ -1,5 +1,5 @@
 # dmginstall-python
- Dmg installer script, written in python. Pkg and zips also work.
+ Dmg installer script, written in python. Pkg, tgz, tbz, tar.gz, tar,bz and zips also work.
 
 ## Requirements
 Homebrew  
@@ -34,6 +34,3 @@ install .pkg files using ```sudo installer -pkg [filename] -target /```
 ![dmg](Screenrecords/dmg_install.gif)
 ![dmg in zip](Screenrecords/dmg_in_zip.gif)
 ![pkg in zip](Screenrecords/pkg_in_zip.gif)
-
-### to do
-- idk
