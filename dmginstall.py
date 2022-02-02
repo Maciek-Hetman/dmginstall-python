@@ -92,20 +92,24 @@ if __name__ == '__main__':
     dirLocation = ""
     tmpDir = "/tmp/working"
     
-    if sys.argv[1] == '-h' or sys.argv == '--help':
-        printHelp()
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '-h' or sys.argv == '--help':
+            printHelp()
     
-    elif sys.argv[1] == '-r' or sys.argv[1] == '--recent':
-        for i in range(2, len(sys.argv)):
-            dirLocation = dirLocation + sys.argv[i] + " "
-        dirLocation = dirLocation[:-1]
-        fileLocation = dirLocation + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation)[:-1]
+        elif sys.argv[1] == '-r' or sys.argv[1] == '--recent':
+            for i in range(2, len(sys.argv)):
+                dirLocation = dirLocation + sys.argv[i] + " "
+            dirLocation = dirLocation[:-1]
+            fileLocation = dirLocation + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation)[:-1]
     
-    else:
-        for i in range(1, len(sys.argv)):
-            fileLocation = fileLocation + sys.argv[i] + " "
+        else:
+            for i in range(1, len(sys.argv)):
+                fileLocation = fileLocation + sys.argv[i] + " "
 
-        fileLocation = fileLocation[:-1]
+            fileLocation = fileLocation[:-1]
+        
+    else:
+        sys.exit("No file given")
     
     # Check whether user has vcp installed
     if getCommandOutput('which vcp') != '':
