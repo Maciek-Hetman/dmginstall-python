@@ -1,6 +1,23 @@
 #!/usr/local/bin/python3
 import os, subprocess, sys
 
+def printHelp():
+    message = """
+    dmginstall - universal dmg/pkg installer for MacOS
+    
+    Usage:
+    dmginstall /path/to/file
+    dmginstall [-r|--recent] /path/to/directory
+    
+    Options:
+    -r - installs recently modified file in given directory
+    -h - prints this message
+    
+    --recent - same as "-r"
+    --help - same as "-h"\n """
+    
+    sys.exit(message)
+
 def getCommandOutput(command):
     return subprocess.check_output(command, shell=True, universal_newlines=True)
 
@@ -52,15 +69,19 @@ def installDmg(cpcmd, pathToFile):
 
 # Original .dmg file location
 if __name__ == '__main__':
-    if sys.argv[1] == '-r':
-        dirLocation = ""
+    fileLocation = ""
+    dirLocation = ""
+    
+    if sys.argv[1] == '-h' or sys.argv == '--help':
+        printHelp()
+    
+    elif sys.argv[1] == '-r' or sys.argv[1] == '--recent':
         for i in range(2, len(sys.argv)):
             dirLocation = dirLocation + sys.argv[i] + " "
         dirLocation = dirLocation[:-1]
         fileLocation = dirLocation + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation)[:-1]
     
     else:
-        fileLocation = ""
         for i in range(1, len(sys.argv)):
             fileLocation = fileLocation + sys.argv[i] + " "
 
@@ -82,13 +103,11 @@ if __name__ == '__main__':
             AppLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir)
             copyApp(cmCmd, AppLoc[:-1])
             os.system('rm -rf "%s"'%tmpDir)
-            sys.exit("Done.")
         
         elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%tmpDir) != '':
             PkgLoc = getCommandOutput('find "%s" -maxdepth 1 -iname "*.pkg"'%tmpDir)
             os.system('sudo installer -pkg "%s" -target /'%PkgLoc[:-1])
             os.system('rm -rf "%s"'%tmpDir)
-            sys.exit("Done.")
         
         elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir) != '':
             fileLocation = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir)
