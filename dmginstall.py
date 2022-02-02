@@ -51,23 +51,31 @@ def installDmg(cpcmd, pathToFile):
         
 
 # Original .dmg file location
-File_location = ""
 if __name__ == '__main__':
+    if sys.argv[1] == '-r':
+        dirLocation = ""
+        for i in range(2, len(sys.argv)):
+            dirLocation = dirLocation + sys.argv[i] + " "
+        dirLocation = dirLocation[:-1]
+        fileLocation = dirLocation + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation)[:-1]
+    
+    else:
+        fileLocation = ""
+        for i in range(1, len(sys.argv)):
+            fileLocation = fileLocation + sys.argv[i] + " "
+
+        fileLocation = fileLocation[:-1]
+    
     # Check whether user has vcp installed
     if getCommandOutput('which vcp') != '':
         cpCmd = "vcp"
     else:
         cpCmd = "cp"
-    
-    # Get file name
-    for i in range(1, len(sys.argv)):
-        File_location = File_location + sys.argv[i] + " "
 
-    File_location = File_location[:-1]
 
-    if ".zip" in File_location:
+    if ".zip" in fileLocation:
         tmpDir = "/tmp/working"
-        os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, File_location, tmpDir))
+        os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
     
         # Check type of file in archive and install it
         if getCommandOutput('find "%s" -maxdepth 1 -iname "*.app"'%tmpDir) != '':
@@ -83,16 +91,16 @@ if __name__ == '__main__':
             sys.exit("Done.")
         
         elif getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir) != '':
-            File_location = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir)
-            installDmg(cpCmd, File_location[:-1])
+            fileLocation = getCommandOutput('find "%s" -maxdepth 1 -iname "*.dmg"'%tmpDir)
+            installDmg(cpCmd, fileLocation[:-1])
             os.system('rm -rf "%s"'%tmpDir)
         
         else:
             os.system('rm -rf "%s"'%tmpDir)
             sys.exit("No usable files in archive")
     
-    elif ".dmg" not in File_location:
+    elif ".dmg" not in fileLocation:
         sys.exit("File is not .dmg nor .zip")
 
     else:
-        installDmg(cpCmd, File_location)
+        installDmg(cpCmd, fileLocation)
