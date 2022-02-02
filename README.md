@@ -36,6 +36,4 @@ install .pkg files using ```sudo installer -pkg [filename] -target /```
 ![pkg in zip](Screenrecords/pkg_in_zip.gif)
 
 ### to do
-- tbz archive support  
-- tar.gz archive support
 - idk
