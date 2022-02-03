@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-from operator import ge
 import subprocess
 import os
 

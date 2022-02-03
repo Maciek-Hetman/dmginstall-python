@@ -20,7 +20,7 @@ Done.
 ```bash
 git clone https://github.com/Maciek-Hetman/dmginstall-python.git
 cd dmginstall-python
-./update.py
+./update
 ``` 
 
 ## Usage
