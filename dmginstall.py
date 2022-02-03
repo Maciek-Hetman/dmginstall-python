@@ -1,10 +1,13 @@
 #!/usr/local/bin/python3
 import os, subprocess, sys
 
+VERSION = "0.4.0"   # Yeah, it's just a random number
+
 def printHelp():
     message = """
     dmginstall - universal dmg/pkg installer for MacOS
-    
+    Version: %s
+
     Usage:
     dmginstall /path/to/file
     dmginstall [-r|--recent] /path/to/directory
@@ -14,7 +17,7 @@ def printHelp():
     -h - prints this message
     
     --recent - same as "-r"
-    --help - same as "-h"\n """
+    --help - same as "-h"\n """%VERSION
    
     print(message)
     sys.exit() 
@@ -78,7 +81,7 @@ if __name__ == '__main__':
     tmpDir = "/tmp/dmginstall"
     
     if len(sys.argv) > 1:
-        if sys.argv[1] == '-h' or sys.argv == '--help':
+        if sys.argv[1] == '-h' or sys.argv[1] == '--help':
             printHelp()
     
         elif sys.argv[1] == '-r' or sys.argv[1] == '--recent':
