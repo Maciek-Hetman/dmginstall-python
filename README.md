@@ -8,13 +8,20 @@ Xcode Command Line Tools (install by typing in terminal ```xcode-select --instal
 vcp (optional, read below)
 
 ## Installation
+### Manual
 ```bash
 git clone https://github.com/Maciek-Hetman/dmginstall-python.git
-cd dmginstall-python.git
+cd dmginstall-python
 cp dmginstall.py /usr/local/bin/dmginstall
 cp vcp /usr/local/bin/vcp
 ```
 Done.
+### A bit less manual
+```bash
+git clone https://github.com/Maciek-Hetman/dmginstall-python.git
+cd dmginstall-python
+./update.py
+``` 
 
 ## Usage
 Type in terminal of your choice 
@@ -34,3 +41,9 @@ install .pkg files using ```sudo installer -pkg [filename] -target /```
 ![dmg](Screenrecords/dmg_install.gif)
 ![dmg in zip](Screenrecords/dmg_in_zip.gif)
 ![pkg in zip](Screenrecords/pkg_in_zip.gif)
+
+## Updating
+Use update script
+```bash
+./update.py
+```

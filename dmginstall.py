@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 import os, subprocess, sys
 
+# More number more newer
 VERSION = "0.4.0"   # Yeah, it's just a random number
 
 def printHelp():
