@@ -11,6 +11,6 @@ if getCommandOutput('which dmginstall') == '':
 else:
     os.system('rm $(which dmginstall)')
     os.system('cp dmginstall.py /usr/local/bin/dmginstall')
-    if getCommandOutput('wchih vcp') == '':
+    if getCommandOutput('which vcp') == '':
         os.system('rm $(which vcp)')
         os.system('cp vcp/vcp /usr/local/bin/vcp') 
