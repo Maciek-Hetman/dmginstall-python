@@ -15,8 +15,9 @@ def printHelp():
     
     --recent - same as "-r"
     --help - same as "-h"\n """
-    
-    sys.exit(message)   # This ends program with error, but I don't really care
+   
+    print(message)
+    sys.exit() 
 
 def getCommandOutput(command):
     return subprocess.check_output(command, shell=True, universal_newlines=True)
