@@ -10,14 +10,14 @@ def printHelp():
     Version: %s
 
     Usage:
-    dmginstall /path/to/file
-    dmginstall [-r|--recent] /path/to/directory
+    dmginstall [-d] /path/to/file
+    dmginstall [-d] [-r] /path/to/directory
     
     Options:
     -r - installs recently modified file in given directory
     -h - prints this message
+    -d - delete installed file
     
-    --recent - same as "-r"
     --help - same as "-h"\n """%VERSION
    
     print(message)
@@ -87,13 +87,11 @@ if __name__ == '__main__':
         printHelp()
     
     if "-r" in args:
-        for i in range(args.index("-r")+1, len(sys.argv)):
-            dirLocation = dirLocation + sys.argv[i] + " "
+        dirLocation = args[args.index("-r")+1]
 
-        fileLocation = dirLocation[:-1] + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation[:-1])
+        fileLocation = dirLocation + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation).translate({ord('\n'): None})
         del args[args.index('-r')+1]
         args.remove('-r')
-        print(fileLocation)
 
     if "-d" in args:
         delete = True
@@ -113,7 +111,8 @@ if __name__ == '__main__':
     print(fileLocation)
 
     if ".zip" in fileLocation:
-        os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
+        print(getCommandOutput('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir)))
+        #os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
         installFromArchive(tmpDir, cpCmd)
         os.system('rm -rf "%s"'%tmpDir)
     
@@ -132,3 +131,6 @@ if __name__ == '__main__':
 
     else:
         installDmg(fileLocation, cpCmd)
+    
+    if delete == True:
+        os.system('rm -rf "%s"'%fileLocation)
