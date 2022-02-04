@@ -22,22 +22,20 @@ git clone https://github.com/Maciek-Hetman/dmginstall-python.git
 cd dmginstall-python
 ./update
 ``` 
-
-## Usage
-Type in terminal of your choice 
-```bash
-dmginstall /path/to/dmg/file.dmg 
-```
-You can also drag file to terminal window instead of manually typing whole path
-
 ## vcp
 vcp is alternative to cp, with progress bar. It's optional if you don't necessarily
 need it. It's compiled from [this github repo](https://github.com/Leask/VCP). See [copyright](vcp/COPYRIGHT).
 
-## How does it work
-Script detect given file format, in case of dmg it automatically mounts, copy and umount dmg file.
+## How to use it
 When given zip file, it unzips it, detects file type installs and remove unzipped files. It can also
-install .pkg files using ```sudo installer -pkg [filename] -target /```
+Script detect given file format, in case of dmg it automatically mounts, copy and umount dmg file.
+install .pkg files using ```sudo installer -pkg [filename] -target /```.
+You can also use ```dmginstall -d``` option to delete installed file and ```dmginstall -r``` to
+install newest file in given directory. For example:  
+```dmginstall -d -r ~/Downloads``` - this will pick newest file in your downloads folder,
+install it and delete original file  
+```dmginstall -d ~/Downloads/app.dmg``` - this will install file and delete app.dmg  
+All options you can see with ```dmginstall -h```  
 ![dmg](Screenrecords/dmg_install.gif)
 ![dmg in zip](Screenrecords/dmg_in_zip.gif)
 ![pkg in zip](Screenrecords/pkg_in_zip.gif)

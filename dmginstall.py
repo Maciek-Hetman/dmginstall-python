@@ -2,7 +2,7 @@
 import os, subprocess, sys
 
 # More number more newer
-VERSION = "0.4.0"   # Yeah, it's just a random number
+VERSION = "0.4.3"   # Yeah, it's just a random number
 
 def printHelp():
     message = """
@@ -85,18 +85,17 @@ if __name__ == '__main__':
 
     if "-h" in args or "--help" in args:
         printHelp()
-    
+
+    if "-d" in args:
+        delete = True
+        args.remove("-d")
+
     if "-r" in args:
         dirLocation = args[args.index("-r")+1]
 
         fileLocation = dirLocation + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation).translate({ord('\n'): None})
         del args[args.index('-r')+1]
         args.remove('-r')
-
-    if "-d" in args:
-        delete = True
-        args.remove("-d")
-    
     else:
         for i in range(1, len(args)):
             fileLocation = fileLocation + sys.argv[i] + " "
@@ -111,8 +110,7 @@ if __name__ == '__main__':
     print(fileLocation)
 
     if ".zip" in fileLocation:
-        print(getCommandOutput('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir)))
-        #os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
+        os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
         installFromArchive(tmpDir, cpCmd)
         os.system('rm -rf "%s"'%tmpDir)
     
