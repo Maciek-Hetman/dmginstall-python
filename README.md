@@ -43,5 +43,6 @@ All options you can see with ```dmginstall -h```
 ## Updating
 Use update script
 ```bash
+git pull origin main
 ./update.py
 ```
