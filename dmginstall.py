@@ -80,31 +80,37 @@ if __name__ == '__main__':
     fileLocation = ""
     dirLocation = ""
     tmpDir = "/tmp/dmginstall"
-    
-    if len(sys.argv) > 1:
-        if sys.argv[1] == '-h' or sys.argv[1] == '--help':
-            printHelp()
-    
-        elif sys.argv[1] == '-r' or sys.argv[1] == '--recent':
-            for i in range(2, len(sys.argv)):
-                dirLocation = dirLocation + sys.argv[i] + " "
+    args = sys.argv
+    delete = False
 
-            fileLocation = dirLocation[:-1] + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation[:-1])[:-1]
+    if "-h" in args or "--help" in args:
+        printHelp()
     
-        else:
-            for i in range(1, len(sys.argv)):
-                fileLocation = fileLocation + sys.argv[i] + " "
+    if "-r" in args:
+        for i in range(args.index("-r")+1, len(sys.argv)):
+            dirLocation = dirLocation + sys.argv[i] + " "
 
-            fileLocation = fileLocation[:-1]
-        
+        fileLocation = dirLocation[:-1] + "/" + getCommandOutput('ls -Art "%s" | tail -n 1'%dirLocation[:-1])
+        del args[args.index('-r')+1]
+        args.remove('-r')
+        print(fileLocation)
+
+    if "-d" in args:
+        delete = True
+        args.remove("-d")
+    
     else:
-        sys.exit("No file given")
-    
+        for i in range(1, len(args)):
+            fileLocation = fileLocation + sys.argv[i] + " "
+        
+        fileLocation = fileLocation[:-1]
+        
     if getCommandOutput('which vcp') != '':
         cpCmd = "vcp"
     else:
         cpCmd = "cp"
 
+    print(fileLocation)
 
     if ".zip" in fileLocation:
         os.system('mkdir "%s" && unzip "%s" -d "%s"'%(tmpDir, fileLocation, tmpDir))
