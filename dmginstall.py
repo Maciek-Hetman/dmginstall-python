@@ -49,7 +49,6 @@ def installDmg(pathToFile, cpCmd):
         pathToSecondDmg = getCommandOutput('find "%s" -iname "*.dmg"'%pathToApp)
         pathToSecondDmg = pathToSecondDmg[:-1]
         os.system('cp "%s" /tmp/working.dmg'%pathToSecondDmg)
-        installDmg(cpcmd, "/tmp/working.dmg")   # cp throwed some errors but it worked anyways. Didn't tested with vcp yet.
         os.system('rm -f /tmp/working.dmg')
     
     installFromArchive(pathToApp, cpCmd)
@@ -132,3 +131,4 @@ if __name__ == '__main__':
     
     if delete == True:
         os.system('rm -rf "%s"'%fileLocation)
+
