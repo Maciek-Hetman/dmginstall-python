@@ -1,5 +1,8 @@
 #!/usr/local/bin/python3
-import os, subprocess, sys
+import os
+import subprocess
+import sys
+
 
 # More number more newer
 VERSION = "0.4.3"   # Yeah, it's just a random number
@@ -33,7 +36,7 @@ def installDmg(pathToFile, cpCmd):
     pathToApp = ""
 
     # Best way I found so far to get volume name and block device
-    searchForBlock = getCommandOutput('hdiutil attach "%s" | grep /Volumes'%pathToFile).split(" ") 
+    searchForBlock = getCommandOutput('hdiutil attach "%s" | grep /Volumes'%pathToFile).split("\t") 
     searchForBlock[len(searchForBlock)-1] = searchForBlock[len(searchForBlock)-1].translate({ord('\n'): None})
 
     for i in range(0, len(searchForBlock)):
